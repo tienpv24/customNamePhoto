@@ -23,7 +23,7 @@
         canvas {
             margin-top: 20px;
             border: 1px solid #ccc;
-            width: 80%; /* Chiếm 80% chiều rộng cửa sổ */
+            width: 60%; /* Chiếm 60% chiều rộng cửa sổ */
             height: auto; /* Giữ tỉ lệ khung hình */
         }
         h1 {
@@ -58,7 +58,7 @@
 
             // Đảm bảo canvas tự động thay đổi kích thước phù hợp với cửa sổ trình duyệt
             const resizeCanvas = () => {
-                const canvasWrapperWidth = window.innerWidth * 0.8; // Chiếm 80% màn hình
+                const canvasWrapperWidth = window.innerWidth * 0.8; // Chiếm 60% màn hình
                 const aspectRatio = img.width / img.height; // Tỉ lệ khung hình
                 canvas.style.width = `${canvasWrapperWidth}px`;
                 canvas.style.height = `${canvasWrapperWidth / aspectRatio}px`;
