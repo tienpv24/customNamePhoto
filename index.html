@@ -1,29 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ghép Tên vào Ảnh</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 20px;
+        }
+        input, button {
+            font-size: 16px;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        canvas {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+        }
+        h1 {
+            color: #333;
+        }
+    </style>
 </head>
 <body>
-    <h1>Nhập tên để ghép:</h1>
+    <h1>Nhập tên của bạn</h1>
     <input type="text" id="name" placeholder="Tên của bạn">
     <button onclick="generateImage()">Tạo Ảnh</button>
-    <br><br>
+    <button onclick="downloadImage()">Tải Xuống Ảnh</button>
+    <br>
     <canvas id="canvas" width="500" height="300"></canvas>
+
     <script>
         function generateImage() {
             const name = document.getElementById('name').value;
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
+            const img = new Image();
 
-            // Nền ảnh
-            ctx.fillStyle = '#FFD700';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // Sử dụng ảnh nền (thay đường dẫn bằng ảnh mẫu của bạn)
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                ctx.font = '30px Arial';
+                ctx.fillStyle = 'black';
+                ctx.textAlign = 'center';
+                ctx.fillText(name, canvas.width / 2, canvas.height / 2);
+            };
+            img.src = 'template.jpg'; // Đường dẫn đến ảnh nền trong cùng thư mục
+        }
 
-            // Thêm tên
-            ctx.font = '30px Arial';
-            ctx.fillStyle = 'black';
-            ctx.textAlign = 'center';
-            ctx.fillText(name, canvas.width / 2, canvas.height / 2);
+        function downloadImage() {
+            const canvas = document.getElementById('canvas');
+            const link = document.createElement('a');
+            link.download = 'customized-image.png';
+            link.href = canvas.toDataURL();
+            link.click();
         }
     </script>
 </body>
