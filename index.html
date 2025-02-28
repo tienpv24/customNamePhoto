@@ -6,7 +6,7 @@
     <title>Ghép Tên vào Ảnh</title>
     <style>
         body {
-            font-family: 'Barlow', sans-serif; /* Font mặc định cho trang */
+            font-family: 'Barlow', sans-serif;
             text-align: center;
             background-color: #f0f8ff;
             margin: 0;
@@ -24,15 +24,14 @@
             display: block;
             margin: 20px auto;
             border: 1px solid #ccc;
-            max-width: 100%; /* Đảm bảo không vượt quá kích thước trình duyệt */
-            height: 80vh; /* Chiếm 80% chiều cao của trình duyệt */
+            max-width: 100%; 
+            height: 80vh; 
         }
         h1 {
             color: #333;
             font-family: 'Barlow', sans-serif;
         }
     </style>
-    <!-- Link Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
 </head>
@@ -49,57 +48,51 @@
         const ctx = canvas.getContext('2d');
         const img = new Image();
 
-        // Hiển thị ảnh template ngay khi tải trang
         img.onload = function () {
             adjustCanvas();
             drawTemplate();
         };
 
-        img.src = 'templateOK.jpg'; // Đường dẫn tới file template
+        img.src = 'templateOK.jpg';
 
-        // Điều chỉnh kích thước canvas để luôn fit với chiều cao trình duyệt
         function adjustCanvas() {
-            canvas.width = (img.width / img.height) * window.innerHeight * 0.8; // Chiều rộng theo tỉ lệ ảnh
-            canvas.height = window.innerHeight * 0.8; // Chiều cao chiếm 80% màn hình
+            canvas.width = (img.width / img.height) * window.innerHeight * 0.8;
+            canvas.height = window.innerHeight * 0.8;
         }
 
-        // Vẽ lại ảnh template
         function drawTemplate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Xóa nội dung cũ
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height); // Vẽ ảnh vào canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         }
 
-        // Vẽ text căn giữa với line spacing và kerning
         function generateImage() {
             const name = document.getElementById('name').value;
-
             drawTemplate();
 
-            // Thiết lập text styling
-            const fontSize = Math.round(canvas.height * 0.15); // Cỡ chữ 15% chiều cao canvas
-            const lineSpacing = fontSize * 1.5; // Line spacing tăng 1.5 lần
+            const fontSize = Math.round(canvas.height * 0.1); // Cỡ chữ 10% chiều cao canvas
+            const padding = canvas.height * 0.1; // Padding trên và dưới chiếm 10%
+            const maxTextHeight = canvas.height - 2 * padding; // Chiều cao tối đa cho text
+            const lineSpacing = fontSize * 1.5;
             ctx.font = `${fontSize}px Montserrat`;
             ctx.fillStyle = 'white';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
             ctx.shadowBlur = 10;
-            ctx.letterSpacing = '-10px'; // Giảm khoảng cách chữ (kerning)
 
-            // Chia text thành dòng
-            const lines = wrapText(name, canvas.width * 0.8, fontSize);
-            const totalTextHeight = lines.length * lineSpacing; // Chiều cao tổng của toàn bộ text
+            const lines = wrapText(name, canvas.width * 0.8);
+            const totalTextHeight = lines.length * lineSpacing;
 
-            // Vẽ từng dòng text căn giữa
-            const startY = (canvas.height - totalTextHeight) / 2; // Bắt đầu vẽ text từ trung tâm canvas
+            const startY = (canvas.height - totalTextHeight) / 2; // Căn giữa theo chiều dọc
             lines.forEach((line, index) => {
                 const textY = startY + index * lineSpacing;
-                ctx.fillText(line, canvas.width / 2, textY);
+                if (textY + lineSpacing <= canvas.height - padding) { 
+                    ctx.fillText(line, canvas.width / 2, textY);
+                }
             });
         }
 
-        // Hàm wrap text để chia text thành nhiều dòng
-        function wrapText(text, maxWidth, fontSize) {
+        function wrapText(text, maxWidth) {
             const words = text.split(' ');
             let lines = [];
             let currentLine = '';
@@ -119,22 +112,19 @@
             return lines;
         }
 
-        // Hàm xử lý tải xuống ảnh
         function downloadImage() {
             const link = document.createElement('a');
             link.download = 'customized-image.jpg';
-            link.href = canvas.toDataURL('image/jpeg', 1.0); // Xuất file JPG với chất lượng cao
+            link.href = canvas.toDataURL('image/jpeg', 1.0);
             link.click();
         }
 
-        // Bấm Enter để tự động nhấn nút "Tạo Ảnh"
         function handleKeyPress(event) {
             if (event.key === 'Enter') {
                 generateImage();
             }
         }
 
-        // Tự động điều chỉnh kích thước canvas khi resize cửa sổ
         window.addEventListener('resize', () => {
             adjustCanvas();
             drawTemplate();
