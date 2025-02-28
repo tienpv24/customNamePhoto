@@ -26,7 +26,15 @@
         h1 {
             color: #333;
         }
+        .custom-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
     </style>
+    <!-- Link Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
     <h1>Nhập tên của bạn</h1>
@@ -43,15 +51,16 @@
             const ctx = canvas.getContext('2d');
             const img = new Image();
 
-            // Sử dụng ảnh nền (thay đường dẫn bằng ảnh mẫu của bạn)
             img.onload = function() {
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                ctx.font = '30px Arial';
-                ctx.fillStyle = 'black';
+                ctx.font = '30px Montserrat'; // Font Montserrat
+                ctx.fillStyle = 'white'; // Màu chữ trắng
                 ctx.textAlign = 'center';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.1)'; // Shadow mờ
+                ctx.shadowBlur = 10; // Độ mờ shadow
                 ctx.fillText(name, canvas.width / 2, canvas.height / 2);
             };
-            img.src = 'template.jpg'; // Đường dẫn đến ảnh nền trong cùng thư mục
+            img.src = 'template.jpg'; // Đường dẫn đến ảnh nền
         }
 
         function downloadImage() {
