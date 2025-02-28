@@ -18,7 +18,7 @@
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            font-family: 'Barlow', sans-serif; /* Font Barlow cho input và button */
+            font-family: 'Barlow', sans-serif;
         }
         canvas {
             margin-top: 20px;
@@ -28,7 +28,7 @@
         }
         h1 {
             color: #333;
-            font-family: 'Barlow', sans-serif; /* Font Barlow cho tiêu đề */
+            font-family: 'Barlow', sans-serif;
         }
     </style>
     <!-- Link Google Fonts -->
@@ -72,21 +72,31 @@
         // Hàm xử lý tạo ảnh khi nhập tên
         function generateImage() {
             const name = document.getElementById('name').value;
-
+            
             // Vẽ lại ảnh template
             ctx.drawImage(img, 0, 0, img.width, img.height);
 
-            // Vẽ text với kích thước lớn hơn 20 lần
-            ctx.save();
-            ctx.translate(canvas.width / 2, canvas.height / 2);
-            ctx.scale(0.93, 1); // Co chữ theo chiều ngang (93%)
-            ctx.font = '300px Montserrat'; // Font Montserrat với kích thước lớn
-            ctx.fillStyle = 'white'; // Màu chữ trắng
+            // Tạo khung văn bản
+            const paddingTopBottom = canvas.height * 0.1; // Cách lề trên và dưới 10%
+            const textAreaWidth = canvas.width; // Chiều rộng khung bằng chiều rộng canvas
+            const textAreaHeight = canvas.height - 2 * paddingTopBottom; // Còn lại là chiều cao khung
+            const x = 0; // Vẽ từ mép trái canvas
+            const y = paddingTopBottom; // Lề trên
+
+            // Cắt text nếu cần
+            const fontSize = 300; // Cỡ chữ 300px
+            const lines = wrapText(name, fontSize, textAreaWidth, textAreaHeight);
+            ctx.fillStyle = 'white';
             ctx.textAlign = 'center';
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.2)'; // Shadow đậm hơn
-            ctx.shadowBlur = 10; // Độ mờ shadow
-            ctx.fillText(name, 0, 0);
-            ctx.restore();
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.2)'; // Shadow
+            ctx.shadowBlur = 10;
+            ctx.font = `${fontSize}px Montserrat`;
+            lines.forEach((line, index) => {
+                const textY = y + (index + 1) * fontSize; // Khoảng cách giữa các dòng chữ
+                if (textY < y + textAreaHeight) {
+                    ctx.fillText(line, canvas.width / 2, textY);
+                }
+            });
         }
 
         // Hàm xử lý tải xuống ảnh
@@ -102,6 +112,46 @@
             if (event.key === 'Enter') {
                 generateImage();
             }
+        }
+
+        // Hàm wrap text để tự động xuống dòng và cắt dấu "..."
+        function wrapText(text, fontSize, textAreaWidth, textAreaHeight) {
+            ctx.font = `${fontSize}px Montserrat`;
+            const words = text.split(' ');
+            let lines = [];
+            let currentLine = '';
+
+            words.forEach((word) => {
+                const testLine = currentLine + word + ' ';
+                const testWidth = ctx.measureText(testLine).width;
+                if (testWidth > textAreaWidth && currentLine !== '') {
+                    lines.push(currentLine);
+                    currentLine = word + ' ';
+                } else {
+                    currentLine = testLine;
+                }
+            });
+
+            if (currentLine) lines.push(currentLine);
+
+            // Truncate with "..." if text exceeds height
+            const totalHeight = lines.length * fontSize;
+            if (totalHeight > textAreaHeight) {
+                const maxLines = Math.floor(textAreaHeight / fontSize);
+                lines = lines.slice(0, maxLines); // Lấy số dòng tối đa
+                const lastLine = lines[maxLines - 1];
+                lines[maxLines - 1] = truncateText(lastLine, textAreaWidth) + '...'; // Thêm "..."
+            }
+
+            return lines;
+        }
+
+        // Hàm cắt text để thêm "..." nếu vượt quá chiều ngang
+        function truncateText(text, maxWidth) {
+            while (ctx.measureText(text + '...').width > maxWidth) {
+                text = text.slice(0, -1); // Bỏ ký tự cuối
+            }
+            return text;
         }
     </script>
 </body>
