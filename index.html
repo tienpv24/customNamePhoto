@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ghép Tên vào Ảnh</title>
+</head>
+<body>
+    <h1>Nhập tên để ghép:</h1>
+    <input type="text" id="name" placeholder="Tên của bạn">
+    <button onclick="generateImage()">Tạo Ảnh</button>
+    <br><br>
+    <canvas id="canvas" width="500" height="300"></canvas>
+    <script>
+        function generateImage() {
+            const name = document.getElementById('name').value;
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Nền ảnh
+            ctx.fillStyle = '#FFD700';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Thêm tên
+            ctx.font = '30px Arial';
+            ctx.fillStyle = 'black';
+            ctx.textAlign = 'center';
+            ctx.fillText(name, canvas.width / 2, canvas.height / 2);
+        }
+    </script>
+</body>
+</html>
