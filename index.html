@@ -21,10 +21,11 @@
             font-family: 'Barlow', sans-serif;
         }
         canvas {
-            margin-top: 20px;
+            display: block;
+            margin: 20px auto;
             border: 1px solid #ccc;
-            width: 60%; /* Chiếm 60% chiều rộng cửa sổ */
-            height: auto; /* Giữ tỉ lệ khung hình */
+            max-width: 100%; /* Đảm bảo không vượt quá kích thước trình duyệt */
+            height: 80vh; /* Chiếm 80% chiều cao của trình duyệt */
         }
         h1 {
             color: #333;
@@ -49,54 +50,73 @@
         const img = new Image();
 
         // Hiển thị ảnh template ngay khi tải trang
-        img.onload = function() {
-            canvas.width = img.width;
-            canvas.height = img.height;
-
-            // Vẽ ảnh template vào canvas
-            ctx.drawImage(img, 0, 0, img.width, img.height);
-
-            // Đảm bảo canvas tự động thay đổi kích thước phù hợp với cửa sổ trình duyệt
-            const resizeCanvas = () => {
-                const canvasWrapperWidth = window.innerWidth * 0.8; // Chiếm 60% màn hình
-                const aspectRatio = img.width / img.height; // Tỉ lệ khung hình
-                canvas.style.width = `${canvasWrapperWidth}px`;
-                canvas.style.height = `${canvasWrapperWidth / aspectRatio}px`;
-            };
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
+        img.onload = function () {
+            adjustCanvas();
+            drawTemplate();
         };
 
         img.src = 'templateOK.jpg'; // Đường dẫn tới file template
 
-        // Hàm xử lý tạo ảnh khi nhập tên
+        // Điều chỉnh kích thước canvas để luôn fit với chiều cao trình duyệt
+        function adjustCanvas() {
+            canvas.width = (img.width / img.height) * window.innerHeight * 0.8; // Chiều rộng theo tỉ lệ ảnh
+            canvas.height = window.innerHeight * 0.8; // Chiều cao chiếm 80% màn hình
+        }
+
+        // Vẽ lại ảnh template
+        function drawTemplate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Xóa nội dung cũ
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height); // Vẽ ảnh vào canvas
+        }
+
+        // Vẽ text căn giữa với line spacing và kerning
         function generateImage() {
             const name = document.getElementById('name').value;
-            
-            // Vẽ lại ảnh template
-            ctx.drawImage(img, 0, 0, img.width, img.height);
 
-            // Tạo khung văn bản
-            const paddingTopBottom = canvas.height * 0.1; // Cách lề trên và dưới 10%
-            const textAreaWidth = canvas.width; // Chiều rộng khung bằng chiều rộng canvas
-            const textAreaHeight = canvas.height - 2 * paddingTopBottom; // Còn lại là chiều cao khung
-            const x = 0; // Vẽ từ mép trái canvas
-            const y = paddingTopBottom; // Lề trên
+            drawTemplate();
 
-            // Cắt text nếu cần
-            const fontSize = 300; // Cỡ chữ 300px
-            const lines = wrapText(name, fontSize, textAreaWidth, textAreaHeight);
+            // Thiết lập text styling
+            const fontSize = Math.round(canvas.height * 0.15); // Cỡ chữ 15% chiều cao canvas
+            const lineSpacing = fontSize * 1.5; // Line spacing tăng 1.5 lần
+            ctx.font = `${fontSize}px Montserrat`;
             ctx.fillStyle = 'white';
             ctx.textAlign = 'center';
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.2)'; // Shadow
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
             ctx.shadowBlur = 10;
-            ctx.font = `${fontSize}px Montserrat`;
+            ctx.letterSpacing = '-10px'; // Giảm khoảng cách chữ (kerning)
+
+            // Chia text thành dòng
+            const lines = wrapText(name, canvas.width * 0.8, fontSize);
+            const totalTextHeight = lines.length * lineSpacing; // Chiều cao tổng của toàn bộ text
+
+            // Vẽ từng dòng text căn giữa
+            const startY = (canvas.height - totalTextHeight) / 2; // Bắt đầu vẽ text từ trung tâm canvas
             lines.forEach((line, index) => {
-                const textY = y + (index + 1) * fontSize; // Khoảng cách giữa các dòng chữ
-                if (textY < y + textAreaHeight) {
-                    ctx.fillText(line, canvas.width / 2, textY);
+                const textY = startY + index * lineSpacing;
+                ctx.fillText(line, canvas.width / 2, textY);
+            });
+        }
+
+        // Hàm wrap text để chia text thành nhiều dòng
+        function wrapText(text, maxWidth, fontSize) {
+            const words = text.split(' ');
+            let lines = [];
+            let currentLine = '';
+
+            words.forEach((word) => {
+                const testLine = currentLine + word + ' ';
+                const testWidth = ctx.measureText(testLine).width;
+                if (testWidth > maxWidth && currentLine !== '') {
+                    lines.push(currentLine);
+                    currentLine = word + ' ';
+                } else {
+                    currentLine = testLine;
                 }
             });
+
+            if (currentLine) lines.push(currentLine);
+            return lines;
         }
 
         // Hàm xử lý tải xuống ảnh
@@ -114,45 +134,11 @@
             }
         }
 
-        // Hàm wrap text để tự động xuống dòng và cắt dấu "..."
-        function wrapText(text, fontSize, textAreaWidth, textAreaHeight) {
-            ctx.font = `${fontSize}px Montserrat`;
-            const words = text.split(' ');
-            let lines = [];
-            let currentLine = '';
-
-            words.forEach((word) => {
-                const testLine = currentLine + word + ' ';
-                const testWidth = ctx.measureText(testLine).width;
-                if (testWidth > textAreaWidth && currentLine !== '') {
-                    lines.push(currentLine);
-                    currentLine = word + ' ';
-                } else {
-                    currentLine = testLine;
-                }
-            });
-
-            if (currentLine) lines.push(currentLine);
-
-            // Truncate with "..." if text exceeds height
-            const totalHeight = lines.length * fontSize;
-            if (totalHeight > textAreaHeight) {
-                const maxLines = Math.floor(textAreaHeight / fontSize);
-                lines = lines.slice(0, maxLines); // Lấy số dòng tối đa
-                const lastLine = lines[maxLines - 1];
-                lines[maxLines - 1] = truncateText(lastLine, textAreaWidth) + '...'; // Thêm "..."
-            }
-
-            return lines;
-        }
-
-        // Hàm cắt text để thêm "..." nếu vượt quá chiều ngang
-        function truncateText(text, maxWidth) {
-            while (ctx.measureText(text + '...').width > maxWidth) {
-                text = text.slice(0, -1); // Bỏ ký tự cuối
-            }
-            return text;
-        }
+        // Tự động điều chỉnh kích thước canvas khi resize cửa sổ
+        window.addEventListener('resize', () => {
+            adjustCanvas();
+            drawTemplate();
+        });
     </script>
 </body>
 </html>
