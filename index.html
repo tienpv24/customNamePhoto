@@ -6,7 +6,7 @@
     <title>Ghép Tên vào Ảnh</title>
     <style>
         body {
-            font-family: 'Barlow', sans-serif;
+            font-family: 'Barlow', sans-serif; /* Font mặc định cho trang */
             text-align: center;
             background-color: #f0f8ff;
             margin: 0;
@@ -18,17 +18,17 @@
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            font-family: 'Barlow', sans-serif;
+            font-family: 'Barlow', sans-serif; /* Font Barlow cho input và button */
         }
         canvas {
             margin-top: 20px;
             border: 1px solid #ccc;
-            width: 80%; /* Chiếm 80% chiều rộng cửa sổ trình duyệt */
-            height: auto; /* Giữ tỉ lệ cố định */
+            width: 80%; /* Chiếm 80% chiều rộng cửa sổ */
+            height: auto; /* Giữ tỉ lệ khung hình */
         }
         h1 {
             color: #333;
-            font-family: 'Barlow', sans-serif;
+            font-family: 'Barlow', sans-serif; /* Font Barlow cho tiêu đề */
         }
     </style>
     <!-- Link Google Fonts -->
@@ -56,7 +56,7 @@
             // Vẽ ảnh template vào canvas
             ctx.drawImage(img, 0, 0, img.width, img.height);
 
-            // Đảm bảo canvas tự động thay đổi kích thước để phù hợp với cửa sổ trình duyệt
+            // Đảm bảo canvas tự động thay đổi kích thước phù hợp với cửa sổ trình duyệt
             const resizeCanvas = () => {
                 const canvasWrapperWidth = window.innerWidth * 0.8; // Chiếm 80% màn hình
                 const aspectRatio = img.width / img.height; // Tỉ lệ khung hình
@@ -67,7 +67,7 @@
             window.addEventListener('resize', resizeCanvas);
         };
 
-        img.src = 'templateOK.jpg'; // Đường dẫn file template
+        img.src = 'templateOK.jpg'; // Đường dẫn tới file template
 
         // Hàm xử lý tạo ảnh khi nhập tên
         function generateImage() {
@@ -76,15 +76,15 @@
             // Vẽ lại ảnh template
             ctx.drawImage(img, 0, 0, img.width, img.height);
 
-            // Vẽ text
+            // Vẽ text với kích thước lớn hơn 20 lần
             ctx.save();
             ctx.translate(canvas.width / 2, canvas.height / 2);
-            ctx.scale(0.93, 1); // Co text theo chiều ngang
-            ctx.font = '30px Montserrat';
-            ctx.fillStyle = 'white';
+            ctx.scale(0.93, 1); // Co chữ theo chiều ngang (93%)
+            ctx.font = '600px Montserrat'; // Font Montserrat với kích thước lớn
+            ctx.fillStyle = 'white'; // Màu chữ trắng
             ctx.textAlign = 'center';
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
-            ctx.shadowBlur = 10;
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.2)'; // Shadow đậm hơn
+            ctx.shadowBlur = 10; // Độ mờ shadow
             ctx.fillText(name, 0, 0);
             ctx.restore();
         }
@@ -93,7 +93,7 @@
         function downloadImage() {
             const link = document.createElement('a');
             link.download = 'customized-image.jpg';
-            link.href = canvas.toDataURL('image/jpeg', 1.0);
+            link.href = canvas.toDataURL('image/jpeg', 1.0); // Xuất file JPG với chất lượng cao
             link.click();
         }
 
